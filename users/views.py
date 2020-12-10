@@ -24,12 +24,14 @@ def login(request):
     """登录View视图函数"""
     if request.method == 'GET':
         # 返回登录页面
-        return render(request, 'login.html')
+        username = request.COOKIES.get('username')
+        return render(request, 'login.html', context={'username': username})
     else:
         # 登录业务逻辑
         # 获取 username 和 password
         username = request.POST.get('username')
         password = request.POST.get('password')
+        remember = request.POST.get('remember')
 
         # 进行用户名和密码校验
         try:
@@ -42,5 +44,8 @@ def login(request):
             return JsonResponse({'message': 'login failed'})
         else:
             # 用户名和密码正确
-            return JsonResponse({'message': 'login success'})
+            response =  JsonResponse({'message': 'login success'})
+            if remember:
+                response.set_cookie('username', username, max_age=14*24*3600)
+            return response
 
